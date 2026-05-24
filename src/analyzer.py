@@ -70,32 +70,56 @@ class AnalyzerFlow:
         
     # -----------------
     # 3つ目のフロー：最大売上データを取得する
-    # ・整形済みの売上データ一覧を受け取る
+    # ・商品別集計データ一覧を受け取る
     # ・sales（売上）が最も大きいデータを探す
     # ・最大売上の1件分データを返す
     # -----------------
-    def get_max_sales_record(self,formatted_sales_records: list[dict[str, str | int]]) ->dict[str,str |int]:
+    def get_max_sales_record(self,item_sales_summary: dict[str, int]) ->dict[str, int]:
         self.logger.info("最大売上データの取得を開始します")
         
         # 0件チェック
         # データが1件もない場合は最大売上を求められないため、
         # 空の辞書を返して呼び出し元へ「該当データなし」を伝える
-        if len(formatted_sales_records) == 0:
+        if len(item_sales_summary) == 0:
             self.logger.info("売上データが０件です")
             #０件だった場合は空の辞書を返す
             return {}
         
         #最大売上を取得する
-        #max関数を利用しているが、辞書のどれを比較するのかの基準値でkey = で基準値salesと教えている
-        #lambdaは無名関数（名前なし関数） -> lambda 引数 : 戻り値
-        max_sales_records = max(formatted_sales_records, key = lambda record: record["sales"])
+        # item_sales_summary のキー（商品名）を比較して最大の商品名を取り出す
+        # max() に dict を渡すとキーを返してくれる
+        max_item = max(item_sales_summary, key = lambda item: item_sales_summary[item])
         
-        self.logger.info(f"最大売上取得完了:{max_sales_records['item']}{max_sales_records['sales']:,}円")
-        return max_sales_records
+        self.logger.info(f"最大売上取得完了:{max_item}{item_sales_summary[max_item]:}円")
+        return {max_item: item_sales_summary[max_item]}
+    
+    # -----------------
+    # 4つ目のフロー：最低売上データを取得する
+    # ・整形済みの売上データ一覧を受け取る
+    # ・sales（売上）が最も低いデータを探す
+    # ・最低売上の1件分データを返す
+    # -----------------
+    def get_min_sales_record(self,item_sales_summary: dict[str, int]) ->dict[str,int]:
+        self.logger.info("最低売上データの取得を開始します")
+        
+        # 0件チェック
+        # データが1件もない場合は最低売上を求められないため、
+        # 空の辞書を返して呼び出し元へ「該当データなし」を伝える
+        if len(item_sales_summary) == 0:
+            self.logger.info("売上データが０件です")
+            #０件だった場合は空の辞書を返す
+            return {}
+        
+        #最低売上を取得する
+        #min関数を利用しているが、辞書のどれを比較するの基準値でkey = で基準値salesと教えている
+        min_item = min(item_sales_summary, key= lambda item: item_sales_summary[item])
+        
+        self.logger.info(f"最低売上取得完了:{min_item}{item_sales_summary[min_item]:}円")
+        return {min_item: item_sales_summary[min_item]}
         
     # -----------------
-    # 4つ目のフロー：商品ごとの売上を集計する
-    # ・整形済みの売上データ一覧を受け取る
+    # 5つ目のフロー：商品ごとの売上を集計する
+    # ・整形済みの売上データ一覧を受け取る 
     # ・item（商品名）ごとに売上をまとめる
     # ・同じ商品があれば売上を加算する
     # ・商品別の集計結果を辞書で返す
@@ -125,12 +149,12 @@ class AnalyzerFlow:
 
 
     # -----------------
-    # 5つ目のフロー：分析結果をまとめる
+    # 6つ目のフロー：分析結果をまとめる
     # ・1つ目〜4つ目の結果を受け取る
     # ・分析結果を1つの辞書にまとめる
     # ・reporter.pyへ渡しやすい形に整える
     # -----------------
-    def build_analysis_result(self, total_sales:int , average_sales: float, max_sales_record:dict[str,str|int],item_sales_summary:dict[str,int]) -> dict:
+    def build_analysis_result(self, total_sales:int , average_sales: float, max_sales_record:dict[str,str|int],min_sales_record:dict[str,str|int] ,item_sales_summary:dict[str,int]) -> dict:
         self.logger.info("分析結果のまとめ処理をします")
         
         #分析結果を１つの辞書にまとめる
@@ -138,7 +162,8 @@ class AnalyzerFlow:
             "total_sales": total_sales,
             "average_sales": average_sales,
             "max_sales_record": max_sales_record,
-            "item_sales_summary": item_sales_summary
+            "item_sales_summary": item_sales_summary,
+            "min_sales_record": min_sales_record
         }
         
         self.logger.info("分析結果のまとめ処理が完了しました")
@@ -167,14 +192,20 @@ if __name__ == "__main__":
     average_sales = analyzer_flow.calculate_average_sales(formatted_sales_records)
     print("平均売上:",average_sales)
     
-    #③最大売上
-    max_sales_record = analyzer_flow.get_max_sales_record(formatted_sales_records)
-    print("最大売上:", max_sales_record)
-    
-    #④商品別売上
+    #⑤商品別売上
     item_sales_summary = analyzer_flow.summarize_sales_by_item(formatted_sales_records)
     print("商品別集計:", item_sales_summary)
     
+    
+    #③最大売上
+    max_sales_record = analyzer_flow.get_max_sales_record(item_sales_summary)
+    print("最大売上:", max_sales_record)
+    
+    #④最低売上
+    min_sales_record = analyzer_flow.get_min_sales_record(item_sales_summary)
+    print("最低売上:", min_sales_record)
+    
+
     #まとめ
-    analysis_result = analyzer_flow.build_analysis_result(total_sales,average_sales,max_sales_record,item_sales_summary)
+    analysis_result = analyzer_flow.build_analysis_result(total_sales,average_sales,max_sales_record,min_sales_record,item_sales_summary)
     print("分析結果:", analysis_result)
