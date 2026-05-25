@@ -83,15 +83,16 @@ class ReportFlow:
     # ・最高売上データを受け取る
     # ・最も売上が高いデータを表示する
     # -----------------
-    def export_max_sales_record(self, max_sales_record:dict[str, str | int] ,output_path:str) ->None:
+    def export_max_sales_record(self, max_sales_record:dict[str, int] ,output_path:str) ->None:
         self.logger.info("最高売上の出力を開始します")
         
         with open(output_path, mode="a", newline="",encoding="utf-8") as csv_file:
             #csvモジュールのwriter機能でライターを作る
             sales_writer = csv.writer(csv_file)
             
-            for key, value in max_sales_record.items():
-                sales_writer.writerow([key, value])
+            for item_name, item_sales  in max_sales_record.items():
+                sales_writer.writerow([REPORT_LABELS["max_item"],item_name])
+                sales_writer.writerow([REPORT_LABELS["max_sales"],item_sales])
             
         self.logger.info("最高売上の出力を完了しました")
 
@@ -100,14 +101,15 @@ class ReportFlow:
     # ・最低売上データを受け取る
     # ・最も売上が低いデータを表示する
     # -----------------
-    def export_min_sales_record(self, min_sales_record:dict[str,str| int], output_path: str) ->None:
+    def export_min_sales_record(self, min_sales_record:dict[str,int], output_path: str) ->None:
         self.logger.info("最低売上の出力を開始します")
         
         with open(output_path, mode="a" , newline="" , encoding= "utf-8") as csv_file:
             #CSVモジュールでwriter機能でライターを作る
             sales_writer = csv.writer(csv_file)
-            for key, value in min_sales_record.items():
-                sales_writer.writerow([key, value])
+            for item_name, item_sales in min_sales_record.items():
+                sales_writer.writerow([REPORT_LABELS["min_item"],item_name])
+                sales_writer.writerow([REPORT_LABELS["min_sales"],item_sales])
             
         self.logger.info("最低売上の出力を完了しました")
         
@@ -135,18 +137,11 @@ if __name__ == "__main__":
     }  # dict[str, int]
 
     # 4つ目
-    max_sales_record = {
-        "date": "2026-05-02",
-        "item": "apple",
-        "sales": 700
-    }  # dict[str, str | int]
+    max_sales_record = {"apple": 700}
 
     # 5つ目
-    min_sales_record = {
-        "date": "2026-05-03",
-        "item": "orange",
-        "sales": 200
-    }  # dict[str, str | int]
+    min_sales_record = {"orange": 200}
+
     
     report_file_path = output_path()
     
