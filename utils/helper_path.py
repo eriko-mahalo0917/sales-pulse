@@ -29,6 +29,12 @@ def output_path():
     from datetime import datetime
     today = datetime.now().strftime("%Y%m%d")
     return get_root_path()/"output"/ f"{today}_report.csv"
+
+#グラフ作成
+def chart_path():
+    from datetime import datetime
+    today = datetime.now().strftime("%Y%m%d")
+    return get_root_path()/"output" / f"{today}_chart.png"
     
 
 

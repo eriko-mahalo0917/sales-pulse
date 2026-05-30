@@ -103,7 +103,7 @@ class LoaderFlow:
         return formatted_sales_records
     
     
-1
+"""
 if __name__ == "__main__":
     #クラスを生成
     loader_flow = LoaderFlow()
@@ -124,3 +124,4 @@ if __name__ == "__main__":
     print("==============整形後のデータ===============")
     for record in formatted_sales_records:
         print(record)
+"""

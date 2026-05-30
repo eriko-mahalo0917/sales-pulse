@@ -112,7 +112,9 @@ class ReportFlow:
                 sales_writer.writerow([REPORT_LABELS["min_sales"],item_sales])
             
         self.logger.info("最低売上の出力を完了しました")
-        
+
+
+"""       
 # =========================================
 # 動作確認用テスト実行
 # =========================================
@@ -159,4 +161,4 @@ if __name__ == "__main__":
     
     #5つ目：最低売上表示
     report_flow.export_min_sales_record(min_sales_record , report_file_path)
-    
+"""

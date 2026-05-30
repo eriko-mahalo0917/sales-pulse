@@ -168,7 +168,7 @@ class AnalyzerFlow:
         
         self.logger.info("分析結果のまとめ処理が完了しました")
         return analysis_result
-
+"""
 # =========================================
 # 動作確認用テスト実行
 # =========================================
@@ -209,3 +209,5 @@ if __name__ == "__main__":
     #まとめ
     analysis_result = analyzer_flow.build_analysis_result(total_sales,average_sales,max_sales_record,min_sales_record,item_sales_summary)
     print("分析結果:", analysis_result)
+    
+"""
